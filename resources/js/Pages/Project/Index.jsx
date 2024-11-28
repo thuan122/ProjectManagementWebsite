@@ -2,6 +2,10 @@ import { Link, usePage, Head } from "@inertiajs/react"
 
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout"
 import Pagination from "@/Components/Pagination";
+import { 
+    PROJECT_STATUS_CLASS_MAP, 
+    PROJECT_STATUS_TEXT_MAP 
+} from "@/constants";
 
 
 export default function Index({ projects }) {
@@ -42,7 +46,14 @@ export default function Index({ projects }) {
                                             {/* <td className="px-3 py-2">
                                                 <img src={project.image} alt={project.name} style={{ width: 60 }} />
                                             </td> */}
-                                            <td className="px-3 py-2">{project.status}</td>
+                                            <td className="px-3 py-2">
+                                                <span
+                                                    className={"px-2 py-1 rounded text-white " 
+                                                        + PROJECT_STATUS_CLASS_MAP[project.status]}
+                                                >
+                                                    {PROJECT_STATUS_TEXT_MAP[project.status]}
+                                                </span>
+                                            </td>
                                             <td className="px-3 py-2 text-nowrap">{project.created_at}</td>
                                             <td className="px-3 py-2 text-nowrap">{project.due_date}</td>
                                             <td className="px-3 py-2">{project.createdBy.name}</td>
