@@ -16,14 +16,35 @@ class ProjectController extends Controller
      */
     public function index()
     {
-        $projects = Project::paginate(10)->onEachSide(1);
+        $query = Project::query();
 
+        /**
+         * Get search condition from the request
+         */
+        $sortFields = request("sort_field", "created_at");
+        $sortDirection = request("sort_direction", "desc");
+
+        if (request("name")) {
+            $query = $query->where("name", "like", "%" . request("name") . "%");
+        }
+
+        if (request("status")) {
+            $query = $query->where("status", request("status"));
+        }
+
+        $projects = $query
+                        ->orderBy($sortFields, $sortDirection)
+                        ->paginate(10)
+                        // ->append(request()->query())
+                        ;
         /**
          * Return to Inertia view, so that it will render to React.js view (JSX file)
          * instead of using Blade template of Laravel
          */
         return Inertia::render('Project/Index', [
-            'projects' => ProjectResource::collection($projects)
+            'projects' => ProjectResource::collection($projects),
+            // Send back to the client the query params, so that it will keep remain
+            'queryParams' => request()->query() ?: null,
         ]);
     }
 

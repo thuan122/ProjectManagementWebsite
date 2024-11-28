@@ -1,17 +1,38 @@
-import { Link, usePage, Head } from "@inertiajs/react"
+import { Link, usePage, Head, router } from "@inertiajs/react"
 
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout"
 import Pagination from "@/Components/Pagination";
-import { 
-    PROJECT_STATUS_CLASS_MAP, 
-    PROJECT_STATUS_TEXT_MAP 
+import {
+    PROJECT_STATUS_CLASS_MAP,
+    PROJECT_STATUS_TEXT_MAP
 } from "@/constants";
+import TextInput from "@/Components/TextInput";
+import SelectInput from "@/Components/SelectInput";
 
-
-export default function Index({ projects }) {
+export default function Index({ projects, queryParams = null }) {
     // Inertia.js already stored the authenticated user inside the system through it's middleware
     // Go to Http/Controller/Middleware/HandleInertiaRequest.php
     const user = usePage().props.auth.user;
+    queryParams = queryParams || {}
+    
+    const searchFieldChange = (name, value) => {
+        if (value) {
+            queryParams[name] = value
+        } else {
+            delete queryParams[name]
+        }
+
+        router.get(route("project.index"), queryParams, {
+            preserveState: true, // Prevent losing state
+            replace: true, // Avoid adding new history entries
+        })
+    }
+
+    const onKeyPress = (name, e) => {
+        if (e.key === 'Enter') {
+            searchFieldChange(name, e.target.value)
+        }
+    }
 
     return (
         <AuthenticatedLayout
@@ -30,12 +51,46 @@ export default function Index({ projects }) {
                                     <tr className="text-nowrap">
                                         <th className="px-3 py-2">ID</th>
                                         <th className="px-3 py-2">Name</th>
-                                        {/* <th className="px-3 py-2">Image</th> */}
+                                        <th className="px-3 py-2"></th>
                                         <th className="px-3 py-2">Status</th>
                                         <th className="px-3 py-2">Created Date</th>
                                         <th className="px-3 py-2">Due Date</th>
                                         <th className="px-3 py-2">Created By</th>
                                         <th className="px-3 py-2 text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400 border-b-2 border-gray-500">
+                                    <tr className="text-nowrap">
+                                        <th className="px-3 py-2"></th>
+                                        <th className="px-3 py-2">
+                                            <TextInput
+                                                className="w-full"
+                                                // This is for when reload the page, the search query will keep remain
+                                                defaultValue={queryParams.name}
+                                                placeholder="Enter project's name"
+                                                // Only search when lost focus on the input
+                                                onBlur={e => searchFieldChange('name', e.target.value)}
+                                                // When typing, it only search when hit Enter
+                                                onKeyPress={e => onKeyPress('name', e)}
+                                            />
+                                        </th>
+                                        <th className="px-3 py-2">
+                                            <SelectInput
+                                                defaultValue={queryParams.status}
+                                                className="w-full"
+                                                onChange={e => searchFieldChange('status', e.target.value)}
+                                            >
+                                                <option value="">Select Status</option>
+                                                <option value="pending">Pending</option>
+                                                <option value="in_progress">In Progress</option>
+                                                <option value="completed">Completed</option>
+                                            </SelectInput>
+                                        </th>
+                                        <th className="px-3 py-2"></th>
+                                        <th className="px-3 py-2"></th>
+                                        <th className="px-3 py-2"></th>
+                                        <th className="px-3 py-2"></th>
+                                        <th className="px-3 py-2"></th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -48,7 +103,7 @@ export default function Index({ projects }) {
                                             </td> */}
                                             <td className="px-3 py-2">
                                                 <span
-                                                    className={"px-2 py-1 rounded text-white " 
+                                                    className={"px-2 py-1 rounded text-white "
                                                         + PROJECT_STATUS_CLASS_MAP[project.status]}
                                                 >
                                                     {PROJECT_STATUS_TEXT_MAP[project.status]}
