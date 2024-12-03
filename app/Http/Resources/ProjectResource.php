@@ -9,6 +9,15 @@ use Illuminate\Http\Resources\Json\JsonResource;
 class ProjectResource extends JsonResource
 {
     /**
+     * This will remove the 'data' wrapper when get data object
+     * normally it would look like this
+     * data {
+     *      prop1:{}
+     *      prop2: data
+     * }
+     */
+    public static $wrap = null;
+    /**
      * Transform the resource into an array.
      * 
      * Basically, it limited the amount of data that return to the view

@@ -171,7 +171,11 @@ export default function Index({ projects, queryParams = null }) {
                                         {projects.data.map((project) => (
                                             <tr key={project.id} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
                                                 <td className="px-3 py-3">{project.id}</td>
-                                                <td className="px-3 py-3">{project.name}</td>
+                                                <td className="px-3 py-3 text-nowrap hover:underline hover:text-white">
+                                                    <Link href={route("project.show", project.id)}>
+                                                        {project.name}
+                                                    </Link>
+                                                </td>
                                                 <td className="px-3 py-3">
                                                     <span
                                                         className={"px-2 py-1 rounded text-white "
