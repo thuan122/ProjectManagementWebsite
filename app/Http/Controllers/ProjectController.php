@@ -2,13 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use Inertia\Inertia;
 use App\Models\Project;
+use Illuminate\Support\Str;
+use App\Http\Resources\TaskResource;
+use Illuminate\Support\Facades\Auth;
+use App\Http\Resources\ProjectResource;
 use App\Http\Requests\StoreProjectRequest;
 use App\Http\Requests\UpdateProjectRequest;
-use App\Http\Resources\ProjectResource;
-use App\Http\Resources\TaskResource;
 use Illuminate\Pagination\AbstractPaginator;
-use Inertia\Inertia;
 
 class ProjectController extends Controller
 {
@@ -46,6 +48,8 @@ class ProjectController extends Controller
             'projects' => ProjectResource::collection($projects),
             // Send back to the client the query params, so that it will keep remain
             'queryParams' => request()->query() ?: null,
+            // Get the 'success' session's value
+            'success' => session('success')
         ]);
     }
 
@@ -54,7 +58,7 @@ class ProjectController extends Controller
      */
     public function create()
     {
-        //
+        return Inertia::render('Project/Create', []);
     }
 
     /**
@@ -62,7 +66,20 @@ class ProjectController extends Controller
      */
     public function store(StoreProjectRequest $request)
     {
-        //
+        $data = $request->validated();
+        /** @var $image object | \Illuminated\Http\UploadedFile */
+        $image = $data['image'] ?? null;
+        $data['created_by'] = Auth::id();
+        $data['updated_by'] = Auth::id();
+        if ($image) {
+            // If the IDE or text editor marked this with an error
+            // it's not
+            $data['image_path'] = $image->store('project/' . Str::snake($data['name']), 'public');
+        }
+
+        Project::create($data);
+
+        return to_route('project.index')->with('success', 'Project created successfully');
     }
 
     /**
