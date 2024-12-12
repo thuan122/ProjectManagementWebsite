@@ -31,8 +31,8 @@ class ProjectResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'description' => $this->description,
-            'created_at' => (new Carbon($this->created_at))->format('d-m-Y'),
-            'due_date' => (new Carbon($this->due_date))->format('d-m-Y'),
+            'created_at' => (new Carbon($this->created_at))->format('Y-m-d'),
+            'due_date' => (new Carbon($this->due_date))->format('Y-m-d'),
             'status' => $this->status,
             // Should make it handling https link of image too, not just local image
             'image_path' => $this->image_path ? Storage::url($this->image_path) : "",

@@ -11,6 +11,7 @@ use App\Http\Resources\ProjectResource;
 use App\Http\Requests\StoreProjectRequest;
 use App\Http\Requests\UpdateProjectRequest;
 use Illuminate\Pagination\AbstractPaginator;
+use Illuminate\Support\Facades\Storage;
 
 class ProjectController extends Controller
 {
@@ -116,7 +117,9 @@ class ProjectController extends Controller
      */
     public function edit(Project $project)
     {
-        //
+        return Inertia::render('Project/Edit', [
+            'project' => new ProjectResource($project)
+        ]);
     }
 
     /**
@@ -124,7 +127,19 @@ class ProjectController extends Controller
      */
     public function update(UpdateProjectRequest $request, Project $project)
     {
-        //
+        $data = $request->validated();
+        $image = $data['image'] ?? null;
+        $data['updated_by'] = Auth::id();
+        if ($image) {
+            if ($project->image_path) {
+                // Delete the old image
+                Storage::disk('public')->deleteDirectory(dirname($project->image_path));
+            }
+            $data['image_path'] = $image->store('project/' . Str::snake($data['name']), 'public');
+        }
+        $project->update($data);
+
+        return to_route("project.index")->with('success', "Project " . $project->name . " updated successfully");
     }
 
     /**
@@ -132,6 +147,12 @@ class ProjectController extends Controller
      */
     public function destroy(Project $project)
     {
-        //
+        $project->delete();
+        // Also remove the image when deleting project
+        if ($project->image_path) {
+            Storage::disk('public')->deleteDirectory(dirname($project->image_path));
+        }
+        
+        return to_route('project.index')->with('success',  "Project " . $project->name . " deleted successfully");
     }
 }

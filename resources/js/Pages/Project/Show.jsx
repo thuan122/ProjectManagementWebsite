@@ -9,7 +9,6 @@ import TaskTable from "../Task/TaskTable";
 
 
 const Show = ({ project, tasks, queryParams }) => {
-    console.log(project)
     return (
         <AuthenticatedLayout
             header={

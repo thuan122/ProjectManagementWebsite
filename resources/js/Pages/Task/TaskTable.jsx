@@ -173,7 +173,6 @@ const TaskTable = ({
                                 <tbody>
                                     {tasks.data.map((task) => (
                                         <tr key={task.id} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                                            {console.log(task)}
                                             <td className="px-3 py-3">{task.id}</td>
                                             {hideProjectColumn === false ? (
                                                 <td className="px-3 py-3">{task.project.name}</td>
