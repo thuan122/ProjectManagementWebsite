@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use Inertia\Inertia;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
+use App\Http\Resources\UserCRUDResource;
 
 class UserController extends Controller
 {
@@ -13,7 +15,34 @@ class UserController extends Controller
      */
     public function index()
     {
-        //
+        $query = User::query();
+        /**
+         * Get search condition from the request
+         */
+        $sortField = request("sort_field", "created_at");
+        $sortDirection = request("sort_direction", "desc");
+
+        if (request("name")) {
+            $query = $query->where("name", "like", "%" . request("name") . "%");
+        }
+
+        if (request("email")) {
+            $query->where("email", "like", "%" . request("email") . "%");
+        }
+
+        $users = $query
+            ->orderBy($sortField, $sortDirection)
+            ->paginate(10)
+            // ->append(request()->query())
+        ;
+
+        return Inertia::render('User/Index', [
+            'users' => UserCRUDResource::collection($users),
+            // Send back to the client the query params, so that it will keep remain
+            'queryParams' => request()->query() ?: null,
+            // Get the 'success' session's value
+            'success' => session('success')
+        ]);
     }
 
     /**
@@ -21,7 +50,7 @@ class UserController extends Controller
      */
     public function create()
     {
-        //
+        return Inertia::render('User/Create', []);
     }
 
     /**
@@ -29,7 +58,14 @@ class UserController extends Controller
      */
     public function store(StoreUserRequest $request)
     {
-        //
+        $data = $request->validated();
+        // This is only for testing and running locally
+        $data['email_verified_at'] = time();
+        $data['password'] = bcrypt($data['password']);
+
+        User::create($data);
+
+        return to_route('user.index')->with('success', 'User created successfully');
     }
 
     /**
@@ -45,7 +81,9 @@ class UserController extends Controller
      */
     public function edit(User $user)
     {
-        //
+        return Inertia::render('User/Edit', [
+            'user' => new UserCRUDResource($user)
+        ]);
     }
 
     /**
@@ -53,7 +91,19 @@ class UserController extends Controller
      */
     public function update(UpdateUserRequest $request, User $user)
     {
-        //
+        $data = $request->validated();
+        $passsword = $data['password'] ?? null;
+        if ($passsword) {
+            $data['password'] = bcrypt($passsword);
+        } else {
+            // remove the 'password' property so that 
+            // it won't update the password column with empty string (which will cause error)
+            unset($data['password']);
+        }
+
+        $user->update($data);
+
+        return to_route("user.index")->with('success', "User " . $user->name . " updated successfully");
     }
 
     /**
@@ -61,6 +111,8 @@ class UserController extends Controller
      */
     public function destroy(User $user)
     {
-        //
+        $user->delete();
+
+        return to_route('user.index')->with('success',  "User " . $user->name . " deleted successfully");
     }
 }
