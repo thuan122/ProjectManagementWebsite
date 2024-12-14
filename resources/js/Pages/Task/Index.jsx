@@ -21,6 +21,7 @@ export default function Index({ tasks, success, queryParams = null }) {
         >
             <Head title="Tasks" />
 
+            // TODO: Need to preserve the query parameters when go to next page
             <div className="py-12">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
                     <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg dark:bg-gray-800">

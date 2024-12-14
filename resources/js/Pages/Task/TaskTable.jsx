@@ -24,7 +24,6 @@ const TaskTable = ({
             delete queryParams[name]
         }
 
-        // Shouldn't this be a dynamic rather than a fixed route?
         router.get(route("task.index"), queryParams)
     }
 

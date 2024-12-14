@@ -67,6 +67,7 @@ class ProjectController extends Controller
      */
     public function store(StoreProjectRequest $request)
     {
+        // TODO: Should make this check for permission before creating
         $data = $request->validated();
         /** @var $image object | \Illuminated\Http\UploadedFile */
         $image = $data['image'] ?? null;
@@ -148,6 +149,7 @@ class ProjectController extends Controller
      */
     public function destroy(Project $project)
     {
+        // TODO: Should be soft delete, and preserve old image
         $project->delete();
         // Also remove the image when deleting project
         if ($project->image_path) {
