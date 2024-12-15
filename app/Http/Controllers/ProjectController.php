@@ -39,6 +39,7 @@ class ProjectController extends Controller
         $projects = $query
             ->orderBy($sortField, $sortDirection)
             ->paginate(10)
+            ->withQueryString()
             // ->append(request()->query())
         ;
         /**
@@ -104,6 +105,7 @@ class ProjectController extends Controller
         $tasks = $query
             ->orderBy($sortField, $sortDirection)
             ->paginate(10)
+            ->withQueryString()
             ->onEachSide(1);
 
         return Inertia::render("Project/Show", [
@@ -155,7 +157,7 @@ class ProjectController extends Controller
         if ($project->image_path) {
             Storage::disk('public')->deleteDirectory(dirname($project->image_path));
         }
-        
+
         return to_route('project.index')->with('success',  "Project " . $project->name . " deleted successfully");
     }
 }
