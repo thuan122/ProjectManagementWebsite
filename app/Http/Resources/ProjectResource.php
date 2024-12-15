@@ -34,7 +34,6 @@ class ProjectResource extends JsonResource
             'created_at' => (new Carbon($this->created_at))->format('Y-m-d'),
             'due_date' => (new Carbon($this->due_date))->format('Y-m-d'),
             'status' => $this->status,
-            // TODO: Should make it handling https link of image too, not just local image
             'image_path' =>  $this->image_path
                 // Check if the image_path is a valid URL, if yes then remain the URL
                 // If not, then store the image inside the 'storage' folder
