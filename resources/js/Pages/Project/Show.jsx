@@ -81,7 +81,6 @@ const Show = ({ project, tasks, queryParams, success }) => {
                 </div>
             </div>
 
-            // TODO: Need to preserve the query parameters when go to next page
             <div className="pb-12">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
                     <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
